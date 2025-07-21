@@ -2,10 +2,11 @@ from fasthtml.common import *
 import matplotlib.pyplot as plt
 
 # Import QueryBase, Employee, Team from employee_events
-#### YOUR CODE HERE
+from python-package.employee_events import QueryBase, Employee, Team
+from report.utils import project_root, model_path, load_model
 
 # import the load_model function from the utils.py file
-#### YOUR CODE HERE
+
 
 """
 Below, we import the parent classes
@@ -24,7 +25,7 @@ from combined_components import FormGroup, CombinedComponent
 
 # Create a subclass of base_components/dropdown
 # called `ReportDropdown`
-#### YOUR CODE HERE
+class ReportDropdown(Dropdown):
     
     # Overwrite the build_component method
     # ensuring it has the same parameters
