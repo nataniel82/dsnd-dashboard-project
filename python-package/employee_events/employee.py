@@ -1,9 +1,7 @@
 # Import the QueryBase class
 from .query_base import QueryBase
-
 # Import dependencies needed for sql execution
 # from the `sql_execution` module
-from sql_execution import connect, db_path
 
 # Define a subclass of QueryBase
 # called Employee

@@ -1,6 +1,6 @@
 # Import any dependencies needed to execute sql queries
 import pandas as pd 
-from sql_execution import QueryMixin
+from .sql_execution import QueryMixin
 
 # Define a class called QueryBase
 # Use inheritance to add methods
@@ -37,8 +37,8 @@ class QueryBase(QueryMixin):
         query_string = f"""
             SELECT
                 event_date,
-                SUM(CASE WHEN event_type = 'positive' THEN 1 ELSE 0 END) AS positive_events,
-                SUM(CASE WHEN event_type = 'negative' THEN 1 ELSE 0 END) AS negative_events
+                SUM(positive_events) AS SUM_POSITIVE_EVENTS,
+                SUM(negative_events) AS SUM_NEGATIVE_EVENTS
             FROM
                 employee_events
             WHERE
@@ -62,15 +62,40 @@ class QueryBase(QueryMixin):
         # with f-string formatting
         # so the query returns the notes
         # for the table name in the `name` class attribute
-        query_string = f"""
-            SELECT
-                t2.note_date,
-                t2.note
-            FROM
-                {self.name} AS t1
-            INNER JOIN
-                notes AS t2 ON t1.employee_id = t2.employee_id
-            WHERE
-                t1.{self.name}_id = ?;
-        """
-        return self.pandas_query(query_string, (id,))
+        if self.name == "employee":
+            query_string = """
+                SELECT
+                    note_date,
+                    note
+                FROM
+                    notes
+                WHERE
+                    employee_id = ?
+                ORDER BY
+                    note_date DESC;
+            """
+            params = (id,)  
+        # Case 2: The model is 'team'. This requires a subquery.
+        elif self.name == "team":
+            query_string = """
+                SELECT
+                    n.note_date,
+                    n.note
+                FROM
+                    notes AS n
+                WHERE
+                    n.employee_id IN (
+                        SELECT e.employee_id
+                        FROM employee AS e
+                        WHERE e.team_id = ?
+                    )
+                ORDER BY
+                    n.note_date DESC;
+            """
+            params = (id,)
+        # Fallback for an unexpected 'name' attribute
+        else:
+            # Return an empty dataframe if the type is not recognized
+            return pd.DataFrame({'note_date': [], 'note': []})
+        # Execute the chosen query using the inherited method from the Mixin
+        return self.pandas_query(query_string, params)

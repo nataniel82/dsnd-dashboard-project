@@ -1,7 +1,6 @@
 # Import the QueryBase class
 from .query_base import QueryBase
 # Import dependencies for sql execution
-from sql_execution import connect, db_path
 
 # Create a subclass of QueryBase
 # called  `Team`
